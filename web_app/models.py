@@ -13,9 +13,15 @@ class MailRecipient(models.Model):
     def __str__(self):
         return f'{self.last_name.title()} {self.name.title()} {self.middle_name.title()}: {self.email}'
 
+    views_counter = models.PositiveIntegerField(
+        verbose_name="Счетчик просмотров",
+        default=0)
+
     class Meta:
         verbose_name = 'Получатель'
         verbose_name_plural = 'Получатели'
         ordering = ('last_name', 'name', 'email')
+
+
 
 
