@@ -1,6 +1,7 @@
 from django.urls import reverse_lazy, reverse
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
 from .forms import MailRecipientForm, MessageForm
+from .models import Mailing
 
 from web_app.models import MailRecipient, Message
 
@@ -74,4 +75,14 @@ class MessageDeleteView(DeleteView):
     model = Message
     success_url = reverse_lazy('web_app:message_list')
 
+class MailingListView(ListView):
+    model = Mailing
+
+class MailingDetailView(DetailView):
+    model = Mailing
+
+    def get_object(self, queryset = None):
+        obj = super().get_object(queryset)
+        obj.update_status()
+        return obj
 

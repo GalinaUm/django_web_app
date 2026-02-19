@@ -1,7 +1,7 @@
 from django import forms
 from django.urls import reverse_lazy
 
-from .models import MailRecipient, Message
+from .models import MailRecipient, Message, Mailing
 from django.core.exceptions import ValidationError
 
 class MailRecipientForm(forms.ModelForm):
@@ -76,5 +76,33 @@ class MessageForm(forms.ModelForm):
         self.fields['message'].widget.attrs.update({
             'class': 'form-control',
             'placeholder': 'Сообщение'
+        })
+
+
+class MailingForm(forms.ModelForm):
+    class Meta:
+        model = Mailing
+        fields = '__all__'
+        success_url = reverse_lazy('MailingListView')
+
+    def __init__(self, *args, **kwargs):
+        super(MailingForm, self).__init__(*args, **kwargs)
+
+        self.fields['start_time'].widget.attrs.update({
+            'class': 'form-control',
+        })
+
+        self.fields['end_time'].widget.attrs.update({
+            'class': 'form-control',
+        })
+
+        self.fields['message'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Сообщение'
+        })
+
+        self.fields['recipients'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Получатели'
         })
 
