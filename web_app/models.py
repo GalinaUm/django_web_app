@@ -1,3 +1,4 @@
+from django.core.validators import MaxLengthValidator
 from django.db import models
 
 
@@ -21,6 +22,23 @@ class MailRecipient(models.Model):
         verbose_name = 'Получатель'
         verbose_name_plural = 'Получатели'
         ordering = ('last_name', 'name', 'email')
+
+
+class Message(models.Model):
+    subject = models.CharField(
+        max_length=70, verbose_name='Тема сообщения', help_text='Напишите тему письма'
+    )
+    message = models.TextField(
+        verbose_name='Сообщение',
+        blank=True,
+        null=True,
+        help_text='Напишите сообщение',
+        max_length=5000,
+        validators=[MaxLengthValidator(5000)]
+    )
+
+    def __str__(self):
+        return f'{self.subject.title()} {self.message}'
 
 
 
