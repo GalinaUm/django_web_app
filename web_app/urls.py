@@ -1,7 +1,6 @@
 from django.urls import path
 from web_app.apps import WebAppConfig
-from web_app.models import Message
-from web_app.views import MailRecipientListView, MainView, BaseView, MailRecipientDetailView, MailRecipientCreateView, \
+from web_app.views import MainView, BaseView, MailRecipientListView, MailRecipientDetailView, MailRecipientCreateView, \
     MailRecipientUpdateView, MailRecipientDeleteView, MessageListView, MessageCreateView, MessageDetailView, \
     MessageUpdateView, MessageDeleteView
 
@@ -20,5 +19,5 @@ urlpatterns = [
     path('web_app/message_create/', MessageCreateView.as_view(), name='message_create'),
     path('web_app/message/<int:pk>/', MessageDetailView.as_view(), name='message_detail'),
     path('web_app/message/<int:pk>/update/', MessageUpdateView.as_view(), name='message_update'),
-    path('web_app/message/<int:pk>/delete/',MessageDeleteView.as_view(), name='message_delete'),
+    path('web_app/message/<int:pk>/delete/', MessageDeleteView.as_view(), name='message_delete'),
 ]
