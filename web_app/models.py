@@ -1,5 +1,7 @@
 from django.core.validators import MaxLengthValidator
 from django.db import models
+from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 
 class MailRecipient(models.Model):
@@ -40,6 +42,60 @@ class Message(models.Model):
     def __str__(self):
         return f'{self.subject.title()} {self.message}'
 
+
+class Mailing(models.Model):
+    STATUS_CHOICES = [
+        ('created', 'Создана'),
+        ('started', 'Запущена'),
+        ('completed', 'Завершена'),
+    ]
+
+    start_time = models.DateTimeField(verbose_name='Дата и время начала')
+    end_time = models.DateTimeField(verbose_name='Дата и время окончания')
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='created',
+        verbose_name='Статус'
+    )
+
+    message = models.ForeignKey(
+        'Message',
+        on_delete=models.CASCADE,
+        verbose_name='Сообщение'
+    )
+
+    recipients = models.ManyToManyField(
+        'MailRecipient',
+        verbose_name='Получатели'
+    )
+
+    def update_status(self):
+        """Динамическое вычисление и сохранение статуса."""
+        now = timezone.now()
+        new_status = self.status
+
+        if now < self.start_time:
+            new_status = 'created'
+        elif self.start_time <= now <= self.end_time:
+            new_status = 'started'
+        elif now > self.end_time:
+            new_status = 'completed'
+
+        if self.status != new_status:
+            self.status = new_status
+            self.save(update_fields=['status'])
+
+    def clean(self):
+        """Валидация полей"""
+        if not self.pk and self.start_time < timezone.now():
+            raise ValidationError({'start_time': "Время начала не может быть в прошлом."})
+
+        if self.start_time >= self.end_time:
+            raise ValidationError("Время начала должно быть строго меньше времени окончания.")
+
+    def __str__(self):
+        return f"Рассылка №{self.id} (старт: {self.start_time})"
 
 
 
