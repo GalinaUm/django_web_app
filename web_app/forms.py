@@ -1,7 +1,7 @@
 from django import forms
 from django.urls import reverse_lazy
 
-from .models import MailRecipient
+from .models import MailRecipient, Message
 from django.core.exceptions import ValidationError
 
 class MailRecipientForm(forms.ModelForm):
@@ -57,4 +57,24 @@ class MailRecipientForm(forms.ModelForm):
 
         if name and last_name and name == last_name:
             self.add_error('last_name', 'Неправильная фамилия!')
+
+
+class MessageForm(forms.ModelForm):
+    class Meta:
+        model = Message
+        fields = '__all__'
+        success_url = reverse_lazy('MessageListView')
+
+    def __init__(self, *args, **kwargs):
+        super(MessageForm, self).__init__(*args, **kwargs)
+
+        self.fields['subject'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Тема сообщения'
+        })
+
+        self.fields['message'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Сообщение'
+        })
 
