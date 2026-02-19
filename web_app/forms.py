@@ -56,5 +56,5 @@ class MailRecipientForm(forms.ModelForm):
         last_name = cleaned_data.get('last_name')
 
         if name and last_name and name == last_name:
-            self.add_error('last_name', 'Смени фамилию, дебил!')
+            self.add_error('last_name', 'Неправильная фамилия!')
 
