@@ -30,13 +30,13 @@ class MailRecipientDetailView(DetailView):
 class MailRecipientCreateView(CreateView):
     model = MailRecipient
     form_class = MailRecipientForm
-    success_url = reverse_lazy('MailRecipientListView')
+    success_url = reverse_lazy('web_app:recipient_list')
 
 
 class MailRecipientUpdateView(UpdateView):
     model = MailRecipient
     form_class = MailRecipientForm
-    success_url = reverse_lazy('MailRecipientListView')
+    success_url = reverse_lazy('web_app:recipient_list')
 
     def get_success_url(self):
         return reverse('web_app:recipient_detail', args=[self.kwargs.get('pk')])
@@ -44,7 +44,7 @@ class MailRecipientUpdateView(UpdateView):
 
 class MailRecipientDeleteView(DeleteView):
     model = MailRecipient
-    success_url = reverse_lazy('MailRecipientListView')
+    success_url = reverse_lazy('web_app:message_list')
 
 
 class MessageListView(ListView):
@@ -60,18 +60,18 @@ class MessageDetailView(DetailView):
 class MessageCreateView(CreateView):
     model = Message
     form_class = MessageForm
-    success_url = reverse_lazy('MessageListView')
+    success_url = reverse_lazy('web_app:message_list')
 
 class MessageUpdateView(UpdateView):
     model = Message
     form_class = MessageForm
-    success_url = reverse_lazy('MessageListView')
+    success_url = reverse_lazy('web_app:message_list')
 
     def get_success_url(self):
         return reverse('web_app:message_detail', args=[self.kwargs.get('pk')])
 
 class MessageDeleteView(DeleteView):
     model = Message
-    success_url = reverse_lazy('MessageListView')
+    success_url = reverse_lazy('web_app:message_list')
 
 

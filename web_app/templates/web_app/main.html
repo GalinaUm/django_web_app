@@ -134,20 +134,11 @@
                             </button>
                             <div class="collapse" id="dashboard-collapse">
                                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                                    <li><a href="#"
+                                    <li><a href="{% url 'web_app:message_list' %}"
                                            class="link-body-emphasis d-inline-flex text-decoration-none rounded">Лист</a>
                                     </li>
-                                    <li><a href="#"
+                                    <li><a href="{% url 'web_app:message_create' %}"
                                            class="link-body-emphasis d-inline-flex text-decoration-none rounded">Создать</a>
-                                    </li>
-                                    <li><a href="#"
-                                           class="link-body-emphasis d-inline-flex text-decoration-none rounded">Просмотреть</a>
-                                    </li>
-                                    <li><a href="#"
-                                           class="link-body-emphasis d-inline-flex text-decoration-none rounded">Изменить</a>
-                                    </li>
-                                    <li><a href="#"
-                                           class="link-body-emphasis d-inline-flex text-decoration-none rounded">Удалить</a>
                                     </li>
                                 </ul>
                             </div>
