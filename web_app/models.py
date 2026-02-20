@@ -43,6 +43,17 @@ class Message(models.Model):
         return f'{self.subject.title()} {self.message}'
 
 
+class MailingAttempt(models.Model):
+    mailing = models.ForeignKey('Mailing', on_delete=models.CASCADE, verbose_name='Рассылка')
+    attempt_time = models.DateTimeField(auto_now_add=True, verbose_name='Время попытки')
+    status = models.CharField(
+        max_length=20,
+        verbose_name='Статус'
+    )
+    server_response = models.TextField(blank=True, null=True, verbose_name='Ответ сервера')
+
+
+
 class Mailing(models.Model):
     STATUS_CHOICES = [
         ('created', 'Создана'),
@@ -96,6 +107,9 @@ class Mailing(models.Model):
 
     def __str__(self):
         return f"Рассылка №{self.id} (старт: {self.start_time})"
+
+
+
 
 
 
