@@ -1,4 +1,5 @@
 from django.urls import reverse_lazy, reverse
+from django.utils import timezone
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.views import View
 from django.shortcuts import redirect, get_object_or_404
@@ -17,6 +18,26 @@ class BaseView(TemplateView):
 
 class MainView(TemplateView):
     template_name = 'web_app/main.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        now = timezone.now()
+
+        # 1. Общее количество всех созданных рассылок
+        context['total_mailings'] = Mailing.objects.count()
+
+        # 2. Количество активных рассылок
+        # Условие: start_time <= now <= end_time И статус 'started'
+        context['active_mailings'] = Mailing.objects.filter(
+            start_time__lte=now,
+            end_time__gte=now,
+            status='started'
+        ).count()
+
+        # 3. Количество уникальных получателей
+        context['unique_recipients'] = MailRecipient.objects.distinct().count()
+
+        return context
 
 
 class MailRecipientListView(ListView):
