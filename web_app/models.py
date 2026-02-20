@@ -40,22 +40,40 @@ class Message(models.Model):
     )
 
     def __str__(self):
-        return f'{self.subject.title()} {self.message}'
+        return self.subject
 
 
 class MailingAttempt(models.Model):
+    STATUS_SUCCESS = 'success'
+    STATUS_FAILURE = 'failure'
+
+    STATUS_CHOICES = [
+        (STATUS_SUCCESS, 'Успешно'),
+        (STATUS_FAILURE, 'Не успешно'),
+    ]
+
     mailing = models.ForeignKey(
         'Mailing',
         on_delete=models.CASCADE,
         related_name='attempts',
         verbose_name='Рассылка'
     )
-    attempt_time = models.DateTimeField(auto_now_add=True, verbose_name='Время попытки')
+    attempt_time = models.DateTimeField(auto_now_add=True, verbose_name='Дата и время попытки')
+
     status = models.CharField(
         max_length=20,
+        choices=STATUS_CHOICES,
         verbose_name='Статус'
     )
     server_response = models.TextField(blank=True, null=True, verbose_name='Ответ сервера')
+
+    class Meta:
+        verbose_name = 'Попытка рассылки'
+        verbose_name_plural = 'Попытки рассылок'
+        ordering = ('-attempt_time',)  # Сначала новые
+
+    def __str__(self):
+        return f"Попытка {self.id} для {self.mailing} ({self.get_status_display()})"
 
 
 

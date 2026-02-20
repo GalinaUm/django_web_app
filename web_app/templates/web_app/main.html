@@ -31,6 +31,38 @@
     {% include 'web_app/includes/inc_menu.html' %}
 </header>
 
+
+
+<div class="container mt-4">
+    <!-- Блок статистики  -->
+    <div class="row text-center mb-5">
+        <div class="col-md-4">
+            <div class="card bg-light shadow-sm">
+                <div class="card-body">
+                    <h6>Всего рассылок: <span class="badge bg-primary">{{ total_mailings }}</span></h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-light shadow-sm">
+                <div class="card-body">
+                    <h6>Активных: <span class="badge bg-success">{{ active_mailings }}</span></h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-light shadow-sm">
+                <div class="card-body">
+                    <h6>Клиентов: <span class="badge bg-info">{{ unique_recipients }}</span></h6>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
 <div class="container-fluid">
     <div class="row">
         <!-- Левая панель (Сайдбар) -->

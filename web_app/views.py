@@ -5,7 +5,7 @@ from django.views import View
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from .forms import MailRecipientForm, MessageForm, MailingForm
-from .models import Mailing
+from .models import Mailing, MailingAttempt
 from web_app.services import MailingAttemptService
 
 from web_app.models import MailRecipient, Message
@@ -108,6 +108,11 @@ class MailingListView(ListView):
 class MailingDetailView(DetailView):
     model = Mailing
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['attempts'] = self.object.attempts.all().order_by('-attempt_time')
+        return context
+
     def get_object(self, queryset = None):
         obj = super().get_object(queryset)
         obj.update_status()
@@ -133,7 +138,6 @@ class MailingDeleteView(DeleteView):
 
 class MailingStartView(View):
 
-    @staticmethod
     def get(self, request, *args, **kwargs):
         mailing = get_object_or_404(Mailing, pk=kwargs.get('pk'))
 
@@ -145,3 +149,10 @@ class MailingStartView(View):
             messages.error(request, message)
 
         return redirect('web_app:mailing_detail', pk=mailing.pk)
+
+
+class MailingAttemptListView(ListView):
+    model = MailingAttempt
+    template_name = 'web_app/mailing_attempt_list.html'
+    # Можно ограничить вывод последними 50 попытками
+    queryset = MailingAttempt.objects.all().order_by('-attempt_time')[:50]
