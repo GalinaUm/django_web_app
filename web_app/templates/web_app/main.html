@@ -118,7 +118,7 @@
                             <div class="collapse show" id="home-collapse">
                                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                                     <li><a href="{% url 'web_app:recipient_list' %}"
-                                           class="link-body-emphasis d-inline-flex text-decoration-none rounded">Лист</a>
+                                           class="link-body-emphasis d-inline-flex text-decoration-none rounded">Список</a>
                                     </li>
                                     <li><a href="{% url 'web_app:recipient_create' %}"
                                            class="link-body-emphasis d-inline-flex text-decoration-none rounded">Создать</a>
@@ -135,7 +135,7 @@
                             <div class="collapse" id="dashboard-collapse">
                                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                                     <li><a href="{% url 'web_app:message_list' %}"
-                                           class="link-body-emphasis d-inline-flex text-decoration-none rounded">Лист</a>
+                                           class="link-body-emphasis d-inline-flex text-decoration-none rounded">Список</a>
                                     </li>
                                     <li><a href="{% url 'web_app:message_create' %}"
                                            class="link-body-emphasis d-inline-flex text-decoration-none rounded">Создать</a>
@@ -146,47 +146,15 @@
                         <li class="mb-1">
                             <button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
                                     data-bs-toggle="collapse" data-bs-target="#orders-collapse" aria-expanded="false">
-                                Orders
+                                Рассылки
                             </button>
                             <div class="collapse" id="orders-collapse">
                                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                                    <li><a href="#"
-                                           class="link-body-emphasis d-inline-flex text-decoration-none rounded">New</a>
+                                    <li><a href="{% url 'web_app:mailing_list' %}"
+                                           class="link-body-emphasis d-inline-flex text-decoration-none rounded">Список</a>
                                     </li>
-                                    <li><a href="#"
-                                           class="link-body-emphasis d-inline-flex text-decoration-none rounded">Processed</a>
-                                    </li>
-                                    <li><a href="#"
-                                           class="link-body-emphasis d-inline-flex text-decoration-none rounded">Shipped</a>
-                                    </li>
-                                    <li><a href="#"
-                                           class="link-body-emphasis d-inline-flex text-decoration-none rounded">Returned</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li class="border-top my-3"></li>
-                        <li class="mb-1">
-                            <button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
-                                    data-bs-toggle="collapse" data-bs-target="#account-collapse" aria-expanded="false">
-                                Рассылка
-                            </button>
-                            <div class="collapse" id="account-collapse">
-                                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                                    <li><a href="#"
-                                           class="link-body-emphasis d-inline-flex text-decoration-none rounded">Лист</a>
-                                    </li>
-                                    <li><a href="#"
+                                    <li><a href="{% url 'web_app:mailing_create' %}"
                                            class="link-body-emphasis d-inline-flex text-decoration-none rounded">Создать</a>
-                                    </li>
-                                    <li><a href="#"
-                                           class="link-body-emphasis d-inline-flex text-decoration-none rounded">Просмотреть</a>
-                                    </li>
-                                    <li><a href="#"
-                                           class="link-body-emphasis d-inline-flex text-decoration-none rounded">Изменить</a>
-                                    </li>
-                                    <li><a href="#"
-                                           class="link-body-emphasis d-inline-flex text-decoration-none rounded">Удалить</a>
                                     </li>
                                 </ul>
                             </div>

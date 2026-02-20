@@ -83,6 +83,10 @@ class MailingForm(forms.ModelForm):
     class Meta:
         model = Mailing
         fields = '__all__'
+        widgets = {
+            'start_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'end_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }
         success_url = reverse_lazy('MailingListView')
 
     def __init__(self, *args, **kwargs):
