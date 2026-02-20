@@ -44,7 +44,12 @@ class Message(models.Model):
 
 
 class MailingAttempt(models.Model):
-    mailing = models.ForeignKey('Mailing', on_delete=models.CASCADE, verbose_name='Рассылка')
+    mailing = models.ForeignKey(
+        'Mailing',
+        on_delete=models.CASCADE,
+        related_name='attempts',
+        verbose_name='Рассылка'
+    )
     attempt_time = models.DateTimeField(auto_now_add=True, verbose_name='Время попытки')
     status = models.CharField(
         max_length=20,
