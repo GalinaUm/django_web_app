@@ -3,10 +3,12 @@ from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView
-from users.forms import UserRegisterForm
+from users.forms import UserRegisterForm, StyledLoginForm
 from users.models import User
 from config import settings
-from django.contrib.auth.views import PasswordResetView
+from django.contrib.auth.views import LogoutView, LoginView
+from django.contrib import messages
+
 
 class RegisterView(CreateView):
     model = User
@@ -42,33 +44,36 @@ def confirm_email(request, token):
 def reset_password(request):
     if request.method == 'POST':
         email = request.POST.get('email')
-        user = get_object_or_404(User, email=email)
-        new_password = secrets.token_hex(8)
-        user.set_password(new_password)
-        user.save()
+        user = User.objects.filter(email=email).first()
 
-        send_mail(
-            subject='Восстановление пароля',
-            message=f'Ваш новый пароль: {new_password}',
-            from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[user.email]
-        )
-        return redirect(reverse('users:login'))
+        if user:
+            new_password = secrets.token_hex(8)
+            user.set_password(new_password)
+            user.save()
+
+            send_mail(
+                subject='Восстановление пароля',
+                message=f'Ваш новый пароль: {new_password}',
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[user.email]
+            )
+            messages.success(request, 'Новый пароль отправлен на вашу почту.')
+            return redirect(reverse('users:login'))
+        else:
+            # Если пользователя нет, возвращаем на ту же страницу с ошибкой
+            messages.error(request, 'Пользователь с таким email не найден.')
+
     return render(request, 'users/reset_password.html')
 
- # {% if user.is_authenticated %}
- #    <a href="{% url 'users:logout' %}">Выйти ({{ user.email }})</a>
- #    {% else %}
- #    <a href="{% url 'users:login' %}">Войти</a>
- #    <a href="{% url 'users:register' %}">Регистрация</a>
- #    {% endif %}
 
-# <form method="post">
-#     {% csrf_token %}
-#     <label for="email">Введите ваш Email для восстановления:</label>
-#     <input type="email" name="email" class="form-control" required>
-#     <button type="submit" class="btn btn-primary mt-3">Сбросить пароль</button>
-# </form>
+class UserLoginView(LoginView):
+    template_name = 'users/login.html'
+    form_class = StyledLoginForm
 
+    def get_success_url(self):
+        return reverse_lazy('web_app:main')
 
-# <a href="{% url 'users:reset-password' %}">Забыли пароль?</a>
+class UserLogoutView(LogoutView):
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+

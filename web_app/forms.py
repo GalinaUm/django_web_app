@@ -4,51 +4,27 @@ from django.urls import reverse_lazy
 from .models import MailRecipient, Message, Mailing
 from django.core.exceptions import ValidationError
 
-class MailRecipientForm(forms.ModelForm):
+
+class StyleFormMixin:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            if isinstance(field, forms.BooleanField):
+                field.widget.attrs['class'] = 'form-check-input'
+            else:
+                field.widget.attrs['class'] = 'form-control'
+
+class MailRecipientForm(StyleFormMixin, forms.ModelForm):
     class Meta:
         model = MailRecipient
         fields = '__all__'
         success_url = reverse_lazy('MailRecipientListView')
-
-    def __init__(self, *args, **kwargs):
-        super(MailRecipientForm, self).__init__(*args, **kwargs)
-
-        self.fields['name'].widget.attrs.update({
-            'class': 'form-control',
-            'placeholder': 'Введите имя',
-        })
-
-        self.fields['middle_name'].widget.attrs.update({
-            'class': 'form-control',
-            'placeholder': 'Введите отчество',
-        })
-
-        self.fields['last_name'].widget.attrs.update({
-            'class': 'form-control',
-            'placeholder': 'Введите фамилию',
-        })
-
-        self.fields['email'].widget.attrs.update({
-            'class': 'form-control',
-            'placeholder': 'Введите email',
-        })
-
-        self.fields['comment'].widget.attrs.update({
-            'class': 'form-control',
-            'placeholder': 'Введите описание',
-        })
-
-        self.fields['views_counter'].widget.attrs.update({
-            'class': 'form-control',
-        })
-
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if not email.endswith('@gmail.com'):
             raise ValidationError('Неправильный конец!')
         return email
-
 
     def clean(self):
         cleaned_data = super().clean()
@@ -59,27 +35,14 @@ class MailRecipientForm(forms.ModelForm):
             self.add_error('last_name', 'Неправильная фамилия!')
 
 
-class MessageForm(forms.ModelForm):
+class MessageForm(StyleFormMixin, forms.ModelForm):
     class Meta:
         model = Message
         fields = '__all__'
         success_url = reverse_lazy('MessageListView')
 
-    def __init__(self, *args, **kwargs):
-        super(MessageForm, self).__init__(*args, **kwargs)
 
-        self.fields['subject'].widget.attrs.update({
-            'class': 'form-control',
-            'placeholder': 'Тема сообщения'
-        })
-
-        self.fields['message'].widget.attrs.update({
-            'class': 'form-control',
-            'placeholder': 'Сообщение'
-        })
-
-
-class MailingForm(forms.ModelForm):
+class MailingForm(StyleFormMixin, forms.ModelForm):
     class Meta:
         model = Mailing
         fields = '__all__'
@@ -89,24 +52,5 @@ class MailingForm(forms.ModelForm):
         }
         success_url = reverse_lazy('MailingListView')
 
-    def __init__(self, *args, **kwargs):
-        super(MailingForm, self).__init__(*args, **kwargs)
 
-        self.fields['start_time'].widget.attrs.update({
-            'class': 'form-control',
-        })
-
-        self.fields['end_time'].widget.attrs.update({
-            'class': 'form-control',
-        })
-
-        self.fields['message'].widget.attrs.update({
-            'class': 'form-control',
-            'placeholder': 'Сообщение'
-        })
-
-        self.fields['recipients'].widget.attrs.update({
-            'class': 'form-control',
-            'placeholder': 'Получатели'
-        })
 

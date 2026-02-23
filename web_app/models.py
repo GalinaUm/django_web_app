@@ -2,6 +2,7 @@ from django.core.validators import MaxLengthValidator
 from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from django.conf import settings
 
 
 class MailRecipient(models.Model):
@@ -132,6 +133,36 @@ class Mailing(models.Model):
         return f"Рассылка №{self.id} (старт: {self.start_time})"
 
 
+
+
+class MailingLog(models.Model):
+    STATUS_CHOICES = [
+        ('success', 'Успешно'),
+        ('failed', 'Ошибка'),
+    ]
+
+    mailing = models.ForeignKey(
+        'Mailing',
+        on_delete=models.CASCADE,
+        verbose_name='Рассылка'
+    )
+    timestamp = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата и время попытки'
+    )
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        verbose_name='Статус'
+    )
+    server_response = models.TextField(
+        verbose_name='Ответ почтового сервера',
+        blank=True, null=True
+    )
+
+    class Meta:
+        verbose_name = 'Лог рассылки'
+        verbose_name_plural = 'Логи рассылок'
 
 
 

@@ -42,7 +42,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -112,3 +112,7 @@ EMAIL_USE_SSL = True
 
 EMAIL_HOST_USER = 'your_login@yandex.ru'
 EMAIL_HOST_PASSWORD = 'your_app_password'
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = 'web_app:main'
+LOGIN_URL = 'users:login'
