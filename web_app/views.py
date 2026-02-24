@@ -9,6 +9,7 @@ from .models import Mailing, MailingAttempt
 from web_app.services import MailingAttemptService
 
 from web_app.models import MailRecipient, Message
+from django.db.models import Count
 
 
 
@@ -151,8 +152,25 @@ class MailingStartView(View):
         return redirect('web_app:mailing_detail', pk=mailing.pk)
 
 
+
 class MailingAttemptListView(ListView):
     model = MailingAttempt
     template_name = 'web_app/mailing_attempt_list.html'
-    # Можно ограничить вывод последними 50 попытками
-    queryset = MailingAttempt.objects.all().order_by('-attempt_time')[:50]
+    context_object_name = 'attempts'  # удобное имя для цикла в шаблоне
+
+    def get_queryset(self):
+        # Ограничиваем вывод последними 50 записями
+        return MailingAttempt.objects.all().order_by('-attempt_time')[:50]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Считаем общую статистику по всем логам (не только по последним 50)
+        all_attempts = MailingAttempt.objects.all()
+
+        context['total_count'] = all_attempts.count()
+        context['success_count'] = all_attempts.filter(status='Успешно').count()
+        context['failed_count'] = all_attempts.filter(status='Не успешно').count()
+
+        return context
+

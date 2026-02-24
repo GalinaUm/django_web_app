@@ -133,8 +133,6 @@ class Mailing(models.Model):
         return f"Рассылка №{self.id} (старт: {self.start_time})"
 
 
-
-
 class MailingLog(models.Model):
     STATUS_CHOICES = [
         ('success', 'Успешно'),

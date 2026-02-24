@@ -15,7 +15,7 @@ class StyleFormMixin:
 class UserRegisterForm(StyleFormMixin, UserCreationForm):
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ['email', 'password1', 'password2']
 
 
 class StyledLoginForm(StyleFormMixin, AuthenticationForm):

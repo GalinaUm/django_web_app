@@ -58,8 +58,54 @@
             </div>
         </div>
     </div>
-
 </div>
+
+<div class="container mt-4">
+    <!-- Блок статистики  -->
+    <div class="row text-center mb-5">
+        <div class="col-md-4">
+            <div class="card bg-light shadow-sm">
+                <div class="card-body">
+                    <h6>Всего попыток: <span class="badge bg-primary">{{ total_count }}</span></h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-light shadow-sm">
+                <div class="card-body">
+                    <h6>Успешно: <span class="badge bg-success">{{ success_count }}</span></h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-light shadow-sm">
+                <div class="card-body">
+                    <h6>Ошибки: <span class="badge bg-info">{{ failed_count }}</span></h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Дата</th>
+            <th>Статус</th>
+            <th>Ответ сервера</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for attempt in attempts %}
+        <tr>
+            <td>{{ attempt.attempt_time|date:"d.m.Y H:i" }}</td>
+            <td>{{ attempt.status }}</td>
+            <td>{{ attempt.server_response }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 
 

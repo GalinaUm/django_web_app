@@ -1,5 +1,5 @@
 from django.contrib import admin
-from web_app.models import MailRecipient, Message
+from web_app.models import MailRecipient, Message, Mailing
 
 
 @admin.register(MailRecipient)
@@ -9,3 +9,7 @@ class MailRecipientAdmin(admin.ModelAdmin):
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
     list_display = ['subject', 'message']
+
+
+
+
