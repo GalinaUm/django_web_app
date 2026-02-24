@@ -6,12 +6,20 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0002_alter_user_managers'),
+        ("users", "0002_alter_user_managers"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='user',
-            options={'permissions': [('can_view_any_mailing', 'Can view any mailing'), ('can_disable_mailing', 'Can disable mailing'), ('can_block_user', 'Can block user')], 'verbose_name': 'Пользователь', 'verbose_name_plural': 'Пользователи'},
+            name="user",
+            options={
+                "permissions": [
+                    ("can_view_any_mailing", "Can view any mailing"),
+                    ("can_disable_mailing", "Can disable mailing"),
+                    ("can_block_user", "Can block user"),
+                ],
+                "verbose_name": "Пользователь",
+                "verbose_name_plural": "Пользователи",
+            },
         ),
     ]

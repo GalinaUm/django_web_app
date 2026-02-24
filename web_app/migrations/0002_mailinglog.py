@@ -7,22 +7,54 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('web_app', '0001_initial'),
+        ("web_app", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='MailingLog',
+            name="MailingLog",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('timestamp', models.DateTimeField(auto_now_add=True, verbose_name='Дата и время попытки')),
-                ('status', models.CharField(choices=[('success', 'Успешно'), ('failed', 'Ошибка')], max_length=10, verbose_name='Статус')),
-                ('server_response', models.TextField(blank=True, null=True, verbose_name='Ответ почтового сервера')),
-                ('mailing', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='web_app.mailing', verbose_name='Рассылка')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "timestamp",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="Дата и время попытки"
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[("success", "Успешно"), ("failed", "Ошибка")],
+                        max_length=10,
+                        verbose_name="Статус",
+                    ),
+                ),
+                (
+                    "server_response",
+                    models.TextField(
+                        blank=True, null=True, verbose_name="Ответ почтового сервера"
+                    ),
+                ),
+                (
+                    "mailing",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="web_app.mailing",
+                        verbose_name="Рассылка",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Лог рассылки',
-                'verbose_name_plural': 'Логи рассылок',
+                "verbose_name": "Лог рассылки",
+                "verbose_name_plural": "Логи рассылок",
             },
         ),
     ]

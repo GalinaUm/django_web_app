@@ -13,8 +13,8 @@ from django.contrib import messages
 class RegisterView(CreateView):
     model = User
     form_class = UserRegisterForm
-    template_name = 'users/register.html'
-    success_url = reverse_lazy('users:login')
+    template_name = "users/register.html"
+    success_url = reverse_lazy("users:login")
 
     def form_valid(self, form):
         user = form.save()
@@ -24,26 +24,28 @@ class RegisterView(CreateView):
         user.save()
 
         host = self.request.get_host()
-        url = f'https://{host}/users/confirm-email/{token}/'
+        url = f"https://{host}/users/confirm-email/{token}/"
 
         send_mail(
-            subject='Подтверждение регистрации',
-            message=f'Для подтверждения перейдите по ссылке: {url}',
+            subject="Подтверждение регистрации",
+            message=f"Для подтверждения перейдите по ссылке: {url}",
             from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[user.email]
+            recipient_list=[user.email],
         )
 
         return super().form_valid(form)
+
 
 def confirm_email(request, token):
     user = get_object_or_404(User, token=token)
     user.is_active = True
     user.save()
-    return redirect(reverse('users:login'))
+    return redirect(reverse("users:login"))
+
 
 def reset_password(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
+    if request.method == "POST":
+        email = request.POST.get("email")
         user = User.objects.filter(email=email).first()
 
         if user:
@@ -52,28 +54,28 @@ def reset_password(request):
             user.save()
 
             send_mail(
-                subject='Восстановление пароля',
-                message=f'Ваш новый пароль: {new_password}',
+                subject="Восстановление пароля",
+                message=f"Ваш новый пароль: {new_password}",
                 from_email=settings.EMAIL_HOST_USER,
-                recipient_list=[user.email]
+                recipient_list=[user.email],
             )
-            messages.success(request, 'Новый пароль отправлен на вашу почту.')
-            return redirect(reverse('users:login'))
+            messages.success(request, "Новый пароль отправлен на вашу почту.")
+            return redirect(reverse("users:login"))
         else:
             # Если пользователя нет, возвращаем на ту же страницу с ошибкой
-            messages.error(request, 'Пользователь с таким email не найден.')
+            messages.error(request, "Пользователь с таким email не найден.")
 
-    return render(request, 'users/reset_password.html')
+    return render(request, "users/reset_password.html")
 
 
 class UserLoginView(LoginView):
-    template_name = 'users/login.html'
+    template_name = "users/login.html"
     form_class = StyledLoginForm
 
     def get_success_url(self):
-        return reverse_lazy('web_app:main')
+        return reverse_lazy("web_app:main")
+
 
 class UserLogoutView(LogoutView):
     def get(self, request, *args, **kwargs):
         return self.post(request, *args, **kwargs)
-

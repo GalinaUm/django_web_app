@@ -31,18 +31,16 @@ class MailingAttemptService:
                     recipient_list=[recipient.email],
                     fail_silently=False,
                 )
-                status = 'Успешно'
-                response = f'Email sent to {recipient.email}'
+                status = "Успешно"
+                response = f"Email sent to {recipient.email}"
                 success_count += 1
             except Exception as e:
-                status = 'Не успешно'
-                response = f'Error for {recipient.email}: {str(e)}'
+                status = "Не успешно"
+                response = f"Error for {recipient.email}: {str(e)}"
 
             # 4. Запись лога для каждого получателя
             MailingAttempt.objects.create(
-                mailing=mailing,
-                status=status,
-                server_response=response
+                mailing=mailing, status=status, server_response=response
             )
 
         # Обновляем статус рассылки (например, на "Выполнена")
