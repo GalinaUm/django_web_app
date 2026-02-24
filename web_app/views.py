@@ -1,5 +1,7 @@
+from django.core.cache import cache
 from django.urls import reverse_lazy, reverse
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.views import View
 from django.shortcuts import redirect, get_object_or_404
@@ -7,10 +9,23 @@ from django.contrib import messages
 from .forms import MailRecipientForm, MessageForm, MailingForm
 from .models import Mailing, MailingAttempt
 from web_app.services import MailingAttemptService
+from django.views.decorators.cache import cache_page
 
 from web_app.models import MailRecipient, Message
-from django.db.models import Count
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 
+
+class OwnerRequiredMixin(UserPassesTestMixin):
+    """Миксин для проверки, является ли пользователь владельцем объекта"""
+
+    def test_func(self):
+        user = self.request.user
+        obj = self.get_object()
+        if user == obj.owner:
+            return True
+        if user.has_perm('your_app.can_disable_mailing') and self.request.resolver_match.url_name == 'mailing_update':
+            return True
+        return False
 
 
 class BaseView(TemplateView):
@@ -41,11 +56,19 @@ class MainView(TemplateView):
         return context
 
 
-class MailRecipientListView(ListView):
+@method_decorator(cache_page(60 * 15), name='dispatch')
+class MailRecipientListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = MailRecipient
 
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff or user.has_perm('your_app.can_view_any_mailing'):
+            return Mailing.objects.all()
+        return Mailing.objects.filter(owner=user)
 
-class MailRecipientDetailView(DetailView):
+
+@method_decorator(cache_page(60 * 15), name='dispatch')
+class MailRecipientDetailView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, DetailView):
     model = MailRecipient
 
     def get_object(self, queryset = None):
@@ -55,13 +78,13 @@ class MailRecipientDetailView(DetailView):
         return self.object
 
 
-class MailRecipientCreateView(CreateView):
+class MailRecipientCreateView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, CreateView):
     model = MailRecipient
     form_class = MailRecipientForm
     success_url = reverse_lazy('web_app:recipient_list')
 
 
-class MailRecipientUpdateView(UpdateView):
+class MailRecipientUpdateView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = MailRecipient
     form_class = MailRecipientForm
     success_url = reverse_lazy('web_app:recipient_list')
@@ -70,27 +93,31 @@ class MailRecipientUpdateView(UpdateView):
         return reverse('web_app:recipient_detail', args=[self.kwargs.get('pk')])
 
 
-class MailRecipientDeleteView(DeleteView):
+class MailRecipientDeleteView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = MailRecipient
     success_url = reverse_lazy('web_app:message_list')
 
 
-class MessageListView(ListView):
+@method_decorator(cache_page(60 * 15), name='dispatch')
+class MessageListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = Message
 
-class MessageDetailView(DetailView):
+
+@method_decorator(cache_page(60 * 15), name='dispatch')
+class MessageDetailView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, DetailView):
     model = Message
     def get_object(self, queryset = None):
         self.object = super().get_object(queryset)
         self.object.save()
         return self.object
 
-class MessageCreateView(CreateView):
+class MessageCreateView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, CreateView):
     model = Message
     form_class = MessageForm
     success_url = reverse_lazy('web_app:message_list')
 
-class MessageUpdateView(UpdateView):
+
+class MessageUpdateView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Message
     form_class = MessageForm
     success_url = reverse_lazy('web_app:message_list')
@@ -98,15 +125,33 @@ class MessageUpdateView(UpdateView):
     def get_success_url(self):
         return reverse('web_app:message_detail', args=[self.kwargs.get('pk')])
 
-class MessageDeleteView(DeleteView):
+
+class MessageDeleteView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Message
     success_url = reverse_lazy('web_app:message_list')
 
 
-class MailingListView(ListView):
+class MailingListView(LoginRequiredMixin, ListView):
     model = Mailing
 
-class MailingDetailView(DetailView):
+    def get_queryset(self):
+        user = self.request.user
+        cache_key = f'mailings_list_user_{user.id}_{user.is_staff}'
+        queryset = cache.get(cache_key)
+
+        if queryset is None:
+            if user.is_staff or user.has_perm('your_app.can_view_any_mailing'):
+                queryset = Mailing.objects.all()
+            else:
+                queryset = Mailing.objects.filter(owner=user)
+
+            cache.set(cache_key, queryset, 900)
+
+        return queryset
+
+
+@method_decorator(cache_page(60 * 15), name='dispatch')
+class MailingDetailView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, DetailView):
     model = Mailing
 
     def get_context_data(self, **kwargs):
@@ -119,12 +164,12 @@ class MailingDetailView(DetailView):
         obj.update_status()
         return obj
 
-class MailingCreateView(CreateView):
+class MailingCreateView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, CreateView):
     model = Mailing
     form_class = MailingForm
     success_url = reverse_lazy('web_app:mailing_list')
 
-class MailingUpdateView(UpdateView):
+class MailingUpdateView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Mailing
     form_class = MailingForm
     success_url = reverse_lazy('web_app:mailing_list')
@@ -132,12 +177,13 @@ class MailingUpdateView(UpdateView):
     def get_success_url(self):
         return reverse('web_app:mailing_detail', args=[self.kwargs.get('pk')])
 
-class MailingDeleteView(DeleteView):
+class MailingDeleteView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Mailing
     success_url = reverse_lazy('web_app:mailing_list')
 
 
-class MailingStartView(View):
+@method_decorator(cache_page(60 * 15), name='dispatch')
+class MailingStartView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         mailing = get_object_or_404(Mailing, pk=kwargs.get('pk'))
@@ -152,8 +198,8 @@ class MailingStartView(View):
         return redirect('web_app:mailing_detail', pk=mailing.pk)
 
 
-
-class MailingAttemptListView(ListView):
+@method_decorator(cache_page(60 * 15), name='dispatch')
+class MailingAttemptListView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, ListView):
     model = MailingAttempt
     template_name = 'web_app/mailing_attempt_list.html'
     context_object_name = 'attempts'  # удобное имя для цикла в шаблоне

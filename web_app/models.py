@@ -6,6 +6,9 @@ from django.conf import settings
 
 
 class MailRecipient(models.Model):
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL,
+    null=True, blank=True, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
     name = models.CharField(max_length=200, verbose_name='Имя', help_text='Введите ваше имя')
     middle_name = models.CharField(max_length=200, verbose_name='Отчество', help_text='Введите ваше отчество')
     last_name = models.CharField(max_length=200, verbose_name='Фамилия', help_text='Введите вашу фамилию')
@@ -13,6 +16,7 @@ class MailRecipient(models.Model):
     comment = models.TextField(
         verbose_name='Описание', blank=True, null=True, help_text='Введите комментарий'
     )
+
 
     def __str__(self):
         return f'{self.last_name.title()} {self.name.title()} {self.middle_name.title()}: {self.email}'

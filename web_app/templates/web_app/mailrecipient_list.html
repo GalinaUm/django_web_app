@@ -1,9 +1,11 @@
 {% extends 'web_app/base.html' %}
 {% load my_tags %}
+{% load cache %}
 {% block content %}
 <div class="album py-5 bg-body-tertiary">
     <div class="container">
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+            {% cache 600 sidebar request.user.email %}
             {% for recipient in object_list %}
             <div class="col">
                 <div class="card shadow-sm">
@@ -26,6 +28,7 @@
                 </div>
             </div>
             {% endfor %}
+            {% endcache %}
         </div>
     </div>
 </div>
