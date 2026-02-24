@@ -12,7 +12,7 @@ from web_app.services import MailingAttemptService
 from django.views.decorators.cache import cache_page
 
 from web_app.models import MailRecipient, Message
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 
 class OwnerRequiredMixin(UserPassesTestMixin):
@@ -57,7 +57,7 @@ class MainView(TemplateView):
 
 
 @method_decorator(cache_page(60 * 15), name='dispatch')
-class MailRecipientListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+class MailRecipientListView(LoginRequiredMixin, ListView):
     model = MailRecipient
 
     def get_queryset(self):
@@ -68,7 +68,7 @@ class MailRecipientListView(LoginRequiredMixin, PermissionRequiredMixin, ListVie
 
 
 @method_decorator(cache_page(60 * 15), name='dispatch')
-class MailRecipientDetailView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, DetailView):
+class MailRecipientDetailView(LoginRequiredMixin, OwnerRequiredMixin, DetailView):
     model = MailRecipient
 
     def get_object(self, queryset = None):
@@ -78,13 +78,13 @@ class MailRecipientDetailView(LoginRequiredMixin, OwnerRequiredMixin, Permission
         return self.object
 
 
-class MailRecipientCreateView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, CreateView):
+class MailRecipientCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
     model = MailRecipient
     form_class = MailRecipientForm
     success_url = reverse_lazy('web_app:recipient_list')
 
 
-class MailRecipientUpdateView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, UpdateView):
+class MailRecipientUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
     model = MailRecipient
     form_class = MailRecipientForm
     success_url = reverse_lazy('web_app:recipient_list')
@@ -93,31 +93,31 @@ class MailRecipientUpdateView(LoginRequiredMixin, OwnerRequiredMixin, Permission
         return reverse('web_app:recipient_detail', args=[self.kwargs.get('pk')])
 
 
-class MailRecipientDeleteView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, DeleteView):
+class MailRecipientDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
     model = MailRecipient
     success_url = reverse_lazy('web_app:message_list')
 
 
 @method_decorator(cache_page(60 * 15), name='dispatch')
-class MessageListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+class MessageListView(LoginRequiredMixin, ListView):
     model = Message
 
 
 @method_decorator(cache_page(60 * 15), name='dispatch')
-class MessageDetailView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, DetailView):
+class MessageDetailView(LoginRequiredMixin, OwnerRequiredMixin, DetailView):
     model = Message
     def get_object(self, queryset = None):
         self.object = super().get_object(queryset)
         self.object.save()
         return self.object
 
-class MessageCreateView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, CreateView):
+class MessageCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
     model = Message
     form_class = MessageForm
     success_url = reverse_lazy('web_app:message_list')
 
 
-class MessageUpdateView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, UpdateView):
+class MessageUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
     model = Message
     form_class = MessageForm
     success_url = reverse_lazy('web_app:message_list')
@@ -126,7 +126,7 @@ class MessageUpdateView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequir
         return reverse('web_app:message_detail', args=[self.kwargs.get('pk')])
 
 
-class MessageDeleteView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, DeleteView):
+class MessageDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
     model = Message
     success_url = reverse_lazy('web_app:message_list')
 
@@ -151,7 +151,7 @@ class MailingListView(LoginRequiredMixin, ListView):
 
 
 @method_decorator(cache_page(60 * 15), name='dispatch')
-class MailingDetailView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, DetailView):
+class MailingDetailView(LoginRequiredMixin, OwnerRequiredMixin, DetailView):
     model = Mailing
 
     def get_context_data(self, **kwargs):
@@ -164,12 +164,12 @@ class MailingDetailView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequir
         obj.update_status()
         return obj
 
-class MailingCreateView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, CreateView):
+class MailingCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
     model = Mailing
     form_class = MailingForm
     success_url = reverse_lazy('web_app:mailing_list')
 
-class MailingUpdateView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, UpdateView):
+class MailingUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
     model = Mailing
     form_class = MailingForm
     success_url = reverse_lazy('web_app:mailing_list')
@@ -177,13 +177,13 @@ class MailingUpdateView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequir
     def get_success_url(self):
         return reverse('web_app:mailing_detail', args=[self.kwargs.get('pk')])
 
-class MailingDeleteView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, DeleteView):
+class MailingDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
     model = Mailing
     success_url = reverse_lazy('web_app:mailing_list')
 
 
 @method_decorator(cache_page(60 * 15), name='dispatch')
-class MailingStartView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, View):
+class MailingStartView(LoginRequiredMixin, OwnerRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         mailing = get_object_or_404(Mailing, pk=kwargs.get('pk'))
@@ -199,7 +199,7 @@ class MailingStartView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequire
 
 
 @method_decorator(cache_page(60 * 15), name='dispatch')
-class MailingAttemptListView(LoginRequiredMixin, OwnerRequiredMixin, PermissionRequiredMixin, ListView):
+class MailingAttemptListView(LoginRequiredMixin, OwnerRequiredMixin, ListView):
     model = MailingAttempt
     template_name = 'web_app/mailing_attempt_list.html'
     context_object_name = 'attempts'  # удобное имя для цикла в шаблоне
