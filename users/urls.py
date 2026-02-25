@@ -6,7 +6,7 @@ from users.views import (
     confirm_email,
     reset_password,
     UserLoginView,
-    UserLogoutView,
+    UserLogoutView, ProfileUpdateView,
 )
 
 app_name = "users"
@@ -27,4 +27,5 @@ urlpatterns = [
     ),
     path("confirm-email/<str:token>/", confirm_email, name="confirm-email"),
     path("reset-password/", reset_password, name="reset-password"),
+    path('profile/', ProfileUpdateView.as_view(), name='profile'),
 ]

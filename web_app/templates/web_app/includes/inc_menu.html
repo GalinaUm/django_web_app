@@ -8,14 +8,15 @@
                     <li><a href="{% url 'web_app:main' %}" class="text-white">Главная</a></li>
                     {% if user.is_authenticated %}
                     <li>
-                    <form action="{% url 'users:logout' %}" method="post">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-link">Выйти ({{ user.email }})</button>
-                    </form>
+                        <form action="{% url 'users:logout' %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-link">Выйти ({{ user.email }})</button>
+                        </form>
                     </li>
                     {% else %}
                     <li><a href="{% url 'users:login' %}" class="text-white">Вход</a></li>
                     <li><a href="{% url 'users:register' %}" class="text-white">Регистрация</a></li>
+                    <li><a href="{% url 'users:profile_form' %}" class="text-white">Изменить</a></li>
                     <li><a href="{% url 'users:reset-password' %}">Забыли пароль?</a></li>
                     {% endif %}
                 </ul>

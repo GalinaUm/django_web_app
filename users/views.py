@@ -1,9 +1,11 @@
 import secrets
+
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
-from django.views.generic import CreateView
-from users.forms import UserRegisterForm, StyledLoginForm
+from django.views.generic import CreateView, UpdateView
+from users.forms import UserRegisterForm, StyledLoginForm, UserProfileForm
 from users.models import User
 from config import settings
 from django.contrib.auth.views import LogoutView, LoginView
@@ -24,7 +26,7 @@ class RegisterView(CreateView):
         user.save()
 
         host = self.request.get_host()
-        url = f"https://{host}/users/confirm-email/{token}/"
+        url = f"http://{host}/users/confirm-email/{token}/"
 
         send_mail(
             subject="Подтверждение регистрации",
@@ -79,3 +81,13 @@ class UserLoginView(LoginView):
 class UserLogoutView(LogoutView):
     def get(self, request, *args, **kwargs):
         return self.post(request, *args, **kwargs)
+
+
+class ProfileUpdateView(LoginRequiredMixin, UpdateView):
+    form_class = UserProfileForm
+    success_url = reverse_lazy('users:profile') # или куда хочешь редиректить
+    template_name = 'users/profile_form.html'
+
+    def get_object(self, queryset=None):
+        # Это ключевой момент: редактируем именно того, кто залогинен
+        return self.request.user

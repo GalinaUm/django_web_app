@@ -38,6 +38,13 @@ class OwnerRequiredMixin(UserPassesTestMixin):
         return False
 
 
+class OwnerEditMixin:
+    """Автоматически назначает текущего пользователя владельцем объекта"""
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
+
 class BaseView(TemplateView):
     template_name = "web_app/base.html"
 
@@ -71,8 +78,8 @@ class MailRecipientListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         user = self.request.user
         if user.is_staff or user.has_perm("your_app.can_view_any_mailing"):
-            return Mailing.objects.all()
-        return Mailing.objects.filter(owner=user)
+            return MailRecipient.objects.all()
+        return MailRecipient.objects.filter(owner=user)
 
 
 @method_decorator(cache_page(60 * 15), name="dispatch")
@@ -86,7 +93,7 @@ class MailRecipientDetailView(LoginRequiredMixin, OwnerRequiredMixin, DetailView
         return self.object
 
 
-class MailRecipientCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
+class MailRecipientCreateView(LoginRequiredMixin, OwnerEditMixin, CreateView):
     model = MailRecipient
     form_class = MailRecipientForm
     success_url = reverse_lazy("web_app:recipient_list")
@@ -121,7 +128,7 @@ class MessageDetailView(LoginRequiredMixin, OwnerRequiredMixin, DetailView):
         return self.object
 
 
-class MessageCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
+class MessageCreateView(LoginRequiredMixin, OwnerEditMixin, CreateView):
     model = Message
     form_class = MessageForm
     success_url = reverse_lazy("web_app:message_list")
@@ -175,7 +182,7 @@ class MailingDetailView(LoginRequiredMixin, OwnerRequiredMixin, DetailView):
         return obj
 
 
-class MailingCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
+class MailingCreateView(LoginRequiredMixin, OwnerEditMixin, CreateView):
     model = Mailing
     form_class = MailingForm
     success_url = reverse_lazy("web_app:mailing_list")

@@ -55,12 +55,13 @@ class Message(models.Model):
 
 
 class MailingAttempt(models.Model):
+    # Используем константы для чистоты кода
     STATUS_SUCCESS = "success"
-    STATUS_FAILURE = "failure"
+    STATUS_FAILURE = "failed"
 
     STATUS_CHOICES = [
         (STATUS_SUCCESS, "Успешно"),
-        (STATUS_FAILURE, "Не успешно"),
+        (STATUS_FAILURE, "Ошибка"),
     ]
 
     mailing = models.ForeignKey(
@@ -69,21 +70,30 @@ class MailingAttempt(models.Model):
         related_name="attempts",
         verbose_name="Рассылка",
     )
-    attempt_time = models.DateTimeField(
-        auto_now_add=True, verbose_name="Дата и время попытки"
+
+    # auto_now_add зафиксирует время создания записи автоматически
+    timestamp = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Дата и время попытки"
     )
 
     status = models.CharField(
-        max_length=20, choices=STATUS_CHOICES, verbose_name="Статус"
+        max_length=10,
+        choices=STATUS_CHOICES,
+        verbose_name="Статус"
     )
+
     server_response = models.TextField(
-        blank=True, null=True, verbose_name="Ответ сервера"
+        blank=True,
+        null=True,
+        verbose_name="Ответ сервера"
     )
 
     class Meta:
         verbose_name = "Попытка рассылки"
         verbose_name_plural = "Попытки рассылок"
-        ordering = ("-attempt_time",)  # Сначала новые
+        # Сортировка от новых к старым полезна для логов
+        ordering = ["-timestamp"]
 
     def __str__(self):
         return f"Попытка {self.id} для {self.mailing} ({self.get_status_display()})"
@@ -108,6 +118,14 @@ class Mailing(models.Model):
 
     recipients = models.ManyToManyField("MailRecipient", verbose_name="Получатели")
 
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL, # Если юзер удален, рассылка останется (будет null)
+        null=True,
+        blank=True,
+        verbose_name="Владелец"
+    )
+
     def update_status(self):
         """Динамическое вычисление и сохранение статуса."""
         now = timezone.now()
@@ -126,39 +144,19 @@ class Mailing(models.Model):
 
     def clean(self):
         """Валидация полей"""
-        if not self.pk and self.start_time < timezone.now():
+
+        if not self.pk and self.start_time and self.start_time < timezone.now():
             raise ValidationError(
                 {"start_time": "Время начала не может быть в прошлом."}
             )
 
-        if self.start_time >= self.end_time:
+        if self.start_time and self.end_time and self.start_time >= self.end_time:
             raise ValidationError(
                 "Время начала должно быть строго меньше времени окончания."
             )
 
     def __str__(self):
-        return f"Рассылка №{self.id} (старт: {self.start_time})"
+        return f"Рассылка №{self.id} (Владелец: {self.owner})"
 
 
-class MailingLog(models.Model):
-    STATUS_CHOICES = [
-        ("success", "Успешно"),
-        ("failed", "Ошибка"),
-    ]
 
-    mailing = models.ForeignKey(
-        "Mailing", on_delete=models.CASCADE, verbose_name="Рассылка"
-    )
-    timestamp = models.DateTimeField(
-        auto_now_add=True, verbose_name="Дата и время попытки"
-    )
-    status = models.CharField(
-        max_length=10, choices=STATUS_CHOICES, verbose_name="Статус"
-    )
-    server_response = models.TextField(
-        verbose_name="Ответ почтового сервера", blank=True, null=True
-    )
-
-    class Meta:
-        verbose_name = "Лог рассылки"
-        verbose_name_plural = "Логи рассылок"
