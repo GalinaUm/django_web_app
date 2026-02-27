@@ -38,6 +38,13 @@ class MailRecipient(models.Model):
 
 
 class Message(models.Model):
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        verbose_name="Владелец",
+        null=True,
+        blank=True
+    )
     subject = models.CharField(
         max_length=70, verbose_name="Тема сообщения", help_text="Напишите тему письма"
     )
@@ -55,7 +62,6 @@ class Message(models.Model):
 
 
 class MailingAttempt(models.Model):
-    # Используем константы для чистоты кода
     STATUS_SUCCESS = "success"
     STATUS_FAILURE = "failed"
 
@@ -71,8 +77,7 @@ class MailingAttempt(models.Model):
         verbose_name="Рассылка",
     )
 
-    # auto_now_add зафиксирует время создания записи автоматически
-    timestamp = models.DateTimeField(
+    attempt_time = models.DateTimeField(
         auto_now_add=True,
         verbose_name="Дата и время попытки"
     )
@@ -93,7 +98,7 @@ class MailingAttempt(models.Model):
         verbose_name = "Попытка рассылки"
         verbose_name_plural = "Попытки рассылок"
         # Сортировка от новых к старым полезна для логов
-        ordering = ["-timestamp"]
+        ordering = ["-attempt_time"]
 
     def __str__(self):
         return f"Попытка {self.id} для {self.mailing} ({self.get_status_display()})"
@@ -125,6 +130,14 @@ class Mailing(models.Model):
         blank=True,
         verbose_name="Владелец"
     )
+
+    class Meta:
+        verbose_name = "Рассылка"
+        verbose_name_plural = "Рассылки"
+
+        permissions = [
+            ("can_disable_mailing", "Can disable mailing"),
+        ]
 
     def update_status(self):
         """Динамическое вычисление и сохранение статуса."""

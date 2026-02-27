@@ -110,12 +110,16 @@ class MailRecipientUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView
 
 class MailRecipientDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
     model = MailRecipient
-    success_url = reverse_lazy("web_app:message_list")
+    success_url = reverse_lazy("web_app:recipient_list")
 
 
 @method_decorator(cache_page(60 * 15), name="dispatch")
 class MessageListView(LoginRequiredMixin, ListView):
     model = Message
+
+    def get_queryset(self):
+        # Пользователь видит только свои сообщения
+        return Message.objects.filter(owner=self.request.user)
 
 
 @method_decorator(cache_page(60 * 15), name="dispatch")
@@ -203,10 +207,14 @@ class MailingDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
 
 
 @method_decorator(cache_page(60 * 15), name="dispatch")
-class MailingStartView(LoginRequiredMixin, OwnerRequiredMixin, View):
+class MailingStartView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         mailing = get_object_or_404(Mailing, pk=kwargs.get("pk"))
+
+        if mailing.owner != request.user and not request.user.has_perm("web_app.can_disable_mailing"):
+            from django.core.exceptions import PermissionDenied
+            raise PermissionDenied
 
         success, message = MailingAttemptService.send_mailing(mailing)
 

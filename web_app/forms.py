@@ -18,14 +18,11 @@ class StyleFormMixin:
 class MailRecipientForm(StyleFormMixin, forms.ModelForm):
     class Meta:
         model = MailRecipient
-        fields = "__all__"
+        exclude = ('owner', 'views_counter',)
         success_url = reverse_lazy("MailRecipientListView")
 
     def clean_email(self):
-        email = self.cleaned_data.get("email")
-        if not email.endswith("@gmail.com"):
-            raise ValidationError("Неправильный конец!")
-        return email
+        return self.cleaned_data.get("email")
 
     def clean(self):
         cleaned_data = super().clean()
@@ -34,6 +31,8 @@ class MailRecipientForm(StyleFormMixin, forms.ModelForm):
 
         if name and last_name and name == last_name:
             self.add_error("last_name", "Неправильная фамилия!")
+
+        return cleaned_data
 
 
 class MessageForm(StyleFormMixin, forms.ModelForm):

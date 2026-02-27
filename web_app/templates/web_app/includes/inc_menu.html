@@ -13,11 +13,11 @@
                             <button type="submit" class="btn btn-link">Выйти ({{ user.email }})</button>
                         </form>
                     </li>
+                    <li><a href="{% url 'users:profile_form' %}" class="text-white">Изменить</a></li>
                     {% else %}
                     <li><a href="{% url 'users:login' %}" class="text-white">Вход</a></li>
                     <li><a href="{% url 'users:register' %}" class="text-white">Регистрация</a></li>
-                    <li><a href="{% url 'users:profile_form' %}" class="text-white">Изменить</a></li>
-                    <li><a href="{% url 'users:reset-password' %}">Забыли пароль?</a></li>
+                    <li><a href="{% url 'users:reset_password' %}">Забыли пароль?</a></li>
                     {% endif %}
                 </ul>
             </div>

@@ -25,7 +25,7 @@ urlpatterns = [
         RegisterView.as_view(template_name="users/register.html"),
         name="register",
     ),
-    path("confirm-email/<str:token>/", confirm_email, name="confirm-email"),
-    path("reset-password/", reset_password, name="reset-password"),
-    path('profile/', ProfileUpdateView.as_view(), name='profile'),
+    path("confirm_email/<str:token>/", confirm_email, name="confirm_email"),
+    path("reset_password/", reset_password, name="reset_password"),
+    path('profile_form/', ProfileUpdateView.as_view(), name='profile_form'),
 ]

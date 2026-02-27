@@ -26,7 +26,7 @@ class RegisterView(CreateView):
         user.save()
 
         host = self.request.get_host()
-        url = f"http://{host}/users/confirm-email/{token}/"
+        url = f"http://{host}/users/confirm_email/{token}/"
 
         send_mail(
             subject="Подтверждение регистрации",
