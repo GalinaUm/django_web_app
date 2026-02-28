@@ -10,9 +10,9 @@ class StyleFormMixin:
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
             if isinstance(field, forms.BooleanField):
-                field.widget.attrs["class"] = "form-check-input"
+                field.widget.attrs.update({"class": "form-check-input"})
             else:
-                field.widget.attrs["class"] = "form-control"
+                field.widget.attrs.update({"class": "form-control"})
 
 
 class MailRecipientForm(StyleFormMixin, forms.ModelForm):
@@ -38,16 +38,14 @@ class MailRecipientForm(StyleFormMixin, forms.ModelForm):
 class MessageForm(StyleFormMixin, forms.ModelForm):
     class Meta:
         model = Message
-        fields = "__all__"
-        success_url = reverse_lazy("MessageListView")
+        exclude = ['owner']
 
 
 class MailingForm(StyleFormMixin, forms.ModelForm):
     class Meta:
         model = Mailing
-        fields = "__all__"
+        exclude = ['owner']
         widgets = {
             "start_time": forms.DateTimeInput(attrs={"type": "datetime-local"}),
             "end_time": forms.DateTimeInput(attrs={"type": "datetime-local"}),
         }
-        success_url = reverse_lazy("MailingListView")
