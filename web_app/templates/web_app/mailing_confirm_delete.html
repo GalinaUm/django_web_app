@@ -1,0 +1,23 @@
+{% extends 'web_app/base.html' %}
+{% load my_tags %}
+{% block content %}
+<div class="album py-5 bg-body-tertiary">
+    <div class="container">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+            <div class="col">
+                <div class="card shadow-sm">
+                    <p class="card-text">Действительно хотите удалить {{object.subject}}</p>
+                    <div class="card-body">
+                        <form enctype="multipart/form-data" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">Delete</button>
+                            <a class="btn btn-primary" href="{% url 'web_app:mailing_list' %}"
+                                   role="button">Cansel</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

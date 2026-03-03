@@ -1,0 +1,85 @@
+{% extends 'web_app/base.html' %}
+{% load my_tags %}
+
+{% block content %}
+<div class="album py-5 bg-body-tertiary">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h5 class="card-title">Рассылка №{{ object.id }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text"><strong>Начало:</strong> {{ object.start_time }}</p>
+                        <p class="card-text"><strong>Конец:</strong> {{ object.end_time }}</p>
+                        <p class="card-text"><strong>Статус:</strong> {{ object.get_status_display }}</p>
+                        <p class="card-text"><strong>Сообщение:</strong> {{ object.message }}</p>
+                        <p class="card-text"><strong>Получатели:</strong>
+                            {% for recipient in object.recipients.all %}
+                            {{ recipient.email }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </p>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="btn-group">
+                                <a class="btn btn-outline-primary" href="{% url 'web_app:mailing_list' %}"
+                                   role="button">Назад</a>
+
+                                <a href="{% url 'web_app:mailing_start' object.pk %}" class="btn btn-warning">Запустить
+                                    вручную</a>
+                            </div>
+                            <small class="text-body-secondary">создано: {{ object.id }}</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- НОВЫЙ БЛОК: История попыток -->
+                <div class="card shadow-sm mt-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">История попыток отправки</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Дата и время</th>
+                                    <th>Статус</th>
+                                    <th>Ответ сервера</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for attempt in object.attempts.all %}
+                                <tr>
+                                    <td>{{ attempt.attempt_time|date:"d.m.Y H:i:s" }}</td>
+                                    <td>
+                                        {% if attempt.status == 'Успешно' %}
+                                        <span class="badge bg-success">Успешно</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Ошибка</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-muted"><small>{{ attempt.server_response }}</small></td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center py-3 text-muted">
+                                        Попыток отправки еще не зафиксировано
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- Конец нового блока -->
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

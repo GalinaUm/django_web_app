@@ -1,0 +1,51 @@
+from django import forms
+from django.urls import reverse_lazy
+
+from .models import MailRecipient, Message, Mailing
+from django.core.exceptions import ValidationError
+
+
+class StyleFormMixin:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            if isinstance(field, forms.BooleanField):
+                field.widget.attrs.update({"class": "form-check-input"})
+            else:
+                field.widget.attrs.update({"class": "form-control"})
+
+
+class MailRecipientForm(StyleFormMixin, forms.ModelForm):
+    class Meta:
+        model = MailRecipient
+        exclude = ('owner', 'views_counter',)
+        success_url = reverse_lazy("MailRecipientListView")
+
+    def clean_email(self):
+        return self.cleaned_data.get("email")
+
+    def clean(self):
+        cleaned_data = super().clean()
+        name = cleaned_data.get("name")
+        last_name = cleaned_data.get("last_name")
+
+        if name and last_name and name == last_name:
+            self.add_error("last_name", "Неправильная фамилия!")
+
+        return cleaned_data
+
+
+class MessageForm(StyleFormMixin, forms.ModelForm):
+    class Meta:
+        model = Message
+        exclude = ['owner']
+
+
+class MailingForm(StyleFormMixin, forms.ModelForm):
+    class Meta:
+        model = Mailing
+        exclude = ['owner']
+        widgets = {
+            "start_time": forms.DateTimeInput(attrs={"type": "datetime-local"}),
+            "end_time": forms.DateTimeInput(attrs={"type": "datetime-local"}),
+        }

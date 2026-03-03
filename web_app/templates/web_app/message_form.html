@@ -1,0 +1,28 @@
+{% extends 'web_app/base.html' %}
+{% load my_tags %}
+{% block content %}
+<div class="album py-5 bg-body-tertiary">
+    <div class="container">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+            <div class="col">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                       <form enctype="multipart/form-data" method="post">
+                           {% csrf_token %}
+                           {{ form.non_field_errors }}
+                           {{ form.as_p }}
+                           <button type="submit" class="btn btn-primary">
+                               {% if object %}
+                               Save
+                               {% else %}
+                               Create
+                               {% endif %}
+                           </button>
+                       </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

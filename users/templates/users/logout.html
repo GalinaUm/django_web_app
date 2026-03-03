@@ -1,0 +1,23 @@
+{% extends 'web_app/base.html' %}
+{% load my_tags %}
+{% block content %}
+<div class="album py-5 bg-body-tertiary">
+    <div class="container">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+            <div class="col">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <form enctype="multipart/form-data" method="post">
+                            {% block content %}
+                            <h2>Вы вышли из системы</h2>
+                            <p>Спасибо, что воспользовались нашим сайтом. Вы успешно вышли из системы.</p>
+                            <a href="{% url 'users:login' %}">Войти снова</a>
+                            {% endblock %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

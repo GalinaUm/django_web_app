@@ -1,0 +1,184 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru" data-bs-theme="auto">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WebApp</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <style>
+        /* Оставляем только нужные стили для сайдбара */
+        .btn-toggle-nav a {
+            padding: .1875rem .5rem;
+            margin-top: .125rem;
+            margin-left: 1.25rem;
+        }
+
+        .btn-toggle-nav a:hover {
+            background-color: var(--bs-tertiary-bg);
+        }
+
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+
+<header data-bs-theme="dark">
+    {% include 'web_app/includes/inc_menu.html' %}
+</header>
+
+
+
+<div class="container mt-4">
+    <!-- Блок статистики  -->
+    <div class="row text-center mb-5">
+        <div class="col-md-4">
+            <div class="card bg-light shadow-sm">
+                <div class="card-body">
+                    <h6>Всего рассылок: <span class="badge bg-primary">{{ total_mailings }}</span></h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-light shadow-sm">
+                <div class="card-body">
+                    <h6>Активных: <span class="badge bg-success">{{ active_mailings }}</span></h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-light shadow-sm">
+                <div class="card-body">
+                    <h6>Клиентов: <span class="badge bg-info">{{ unique_recipients }}</span></h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <!-- Блок статистики  -->
+    <div class="row text-center mb-5">
+        <div class="col-md-4">
+            <div class="card bg-light shadow-sm">
+                <div class="card-body">
+                    <h6>Всего попыток: <span class="badge bg-primary">{{ total_count }}</span></h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-light shadow-sm">
+                <div class="card-body">
+                    <h6>Успешно: <span class="badge bg-success">{{ success_count }}</span></h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-light shadow-sm">
+                <div class="card-body">
+                    <h6>Ошибки: <span class="badge bg-info">{{ failed_count }}</span></h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Дата</th>
+            <th>Статус</th>
+            <th>Ответ сервера</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for attempt in attempts %}
+        <tr>
+            <td>{{ attempt.attempt_time|date:"d.m.Y H:i" }}</td>
+            <td>{{ attempt.status }}</td>
+            <td>{{ attempt.server_response }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Левая панель (Сайдбар) -->
+        <nav class="col-md-3 col-lg-2 d-md-block bg-body-tertiary sidebar vh-100 border-end p-3">
+            <span class="fs-5 fw-semibold border-bottom pb-2 mb-3 d-block">Разделы</span>
+            <ul class="list-unstyled ps-0">
+                <!-- Получатели -->
+                <li class="mb-1">
+                    <button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
+                            data-bs-toggle="collapse" data-bs-target="#home-collapse">Получатели
+                    </button>
+                    <div class="collapse show" id="home-collapse">
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                            <li><a href="{% url 'web_app:recipient_list' %}"
+                                   class="link-body-emphasis d-inline-flex text-decoration-none rounded">Список</a></li>
+                            <li><a href="{% url 'web_app:recipient_create' %}"
+                                   class="link-body-emphasis d-inline-flex text-decoration-none rounded">Создать</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Сообщения -->
+                <li class="mb-1">
+                    <button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
+                            data-bs-toggle="collapse" data-bs-target="#dashboard-collapse">Сообщения
+                    </button>
+                    <div class="collapse" id="dashboard-collapse">
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                            <li><a href="{% url 'web_app:message_list' %}"
+                                   class="link-body-emphasis d-inline-flex text-decoration-none rounded">Список</a></li>
+                            <li><a href="{% url 'web_app:message_create' %}"
+                                   class="link-body-emphasis d-inline-flex text-decoration-none rounded">Создать</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Рассылки -->
+                <li class="mb-1">
+                    <button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
+                            data-bs-toggle="collapse" data-bs-target="#orders-collapse">Рассылки
+                    </button>
+                    <div class="collapse" id="orders-collapse">
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                            <li><a href="{% url 'web_app:mailing_list' %}"
+                                   class="link-body-emphasis d-inline-flex text-decoration-none rounded">Список</a></li>
+                            <li><a href="{% url 'web_app:mailing_create' %}"
+                                   class="link-body-emphasis d-inline-flex text-decoration-none rounded">Создать</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Основной контент (Правая часть) -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            <!-- Вывод сообщений (Django Messages) -->
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">{{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</div>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>
